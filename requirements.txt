@@ -3,3 +3,4 @@ trimesh
 open3d
 numpy
 pyglet<2
+kaggle

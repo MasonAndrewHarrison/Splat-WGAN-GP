@@ -1,3 +1,6 @@
 model_uids.txt
 __pycache__/
 .venv/
+dataset/
+dataset_images/
+dataset_point_clouds/
