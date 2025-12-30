@@ -1,0 +1,4 @@
+objaverse
+trimesh
+open3d
+numpy
