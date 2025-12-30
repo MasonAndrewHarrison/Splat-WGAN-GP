@@ -3,10 +3,14 @@ import numpy as np
 import point_cloud as pc
 import render
 
+
 N_POINTS = 1000
 
 with open("model_uids.txt", "r") as f:
     uids = [line.strip() for line in f]
+
+
+
 
 objects = objaverse.load_objects(uids=uids)
 

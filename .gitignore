@@ -4,3 +4,5 @@ __pycache__/
 dataset/
 dataset_images/
 dataset_point_clouds/
+test.py
+temp/

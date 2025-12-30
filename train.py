@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
+from torchvision.utils import save_image
 from torchvision.datasets import ImageFolder 
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
@@ -11,7 +12,6 @@ batch_size = 64
 transform = transforms.Compose([
 
     transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
 dataset = ImageFolder(root='dataset_images', transform=transform)
@@ -39,12 +39,13 @@ while not correct_dim:
 
             image = temp_image
             correct_dim = True
+            #image = image.permute(1, 2, 0)
+            #image = image * 0.5 + 0.5
 
+            print(image.shape)
+            save_image(image, "test.png")
 
-
-image = image.permute(1, 2, 0)
-image = image * 0.5 + 0.5
-
+'''
 print(image.shape)
 plt.imshow(image)
-plt.show()
+plt.show()'''
