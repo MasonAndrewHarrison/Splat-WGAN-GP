@@ -1,7 +1,9 @@
 import objaverse
-import trimesh
+import numpy as np
+import mesh_to_pc as mtpc
 import render
 
+N_POINTS = 1000
 
 with open("model_uids.txt", "r") as f:
     uids = [line.strip() for line in f]
@@ -12,9 +14,7 @@ for uid, filepath in objects.items():
     print(filepath)
 
 
-    mesh = trimesh.load(filepath, force='mesh')
+    point_cloud = mtpc.mesh_to_pc(filepath, 1000)
+    print(point_cloud.shape)
 
-    vertices = mesh.vertices
-
-    print(vertices)
-    render.show_model(vertices)
+    render.show_model(point_cloud)

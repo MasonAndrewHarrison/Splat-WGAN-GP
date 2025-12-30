@@ -10,7 +10,7 @@ def show_model(point_cloud):
     else:
         pcd_list = o3d.geometry.PointCloud()
         pcd_list.points = o3d.utility.Vector3dVector(point_cloud[:, :3])
-        #pcd_list.colors = o3d.utility.Vector3dVector(point_cloud[:, 3:])
+        pcd_list.colors = o3d.utility.Vector3dVector(point_cloud[:, 3:])
 
         #o3d.visualization.draw_geometries([pcd_list])
 
