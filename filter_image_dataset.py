@@ -29,12 +29,9 @@ for i, (image,_) in enumerate(dataset):
         if torch.equal(first_pixel, target) and torch.equal(last_pixel, target):
 
             true_image_index += 1
-
-            print(image.shape)
-            save_image(image, f"temp/all/test{i}.png")
-
-            exit()
+            save_image(image, f"temp/all/img{i}.png")
 
 
 
-shutil.rmtree("dataset_images/")
+
+#shutil.rmtree("dataset_images/")
