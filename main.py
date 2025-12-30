@@ -1,6 +1,6 @@
 import objaverse
 import numpy as np
-import mesh_to_pc as mtpc
+import point_cloud as pc
 import render
 
 N_POINTS = 1000
@@ -14,7 +14,7 @@ for uid, filepath in objects.items():
     print(filepath)
 
 
-    point_cloud = mtpc.mesh_to_pc(filepath, 1000)
+    point_cloud = pc.mesh_to_pc(filepath, 1000)
     print(point_cloud.shape)
 
     render.show_model(point_cloud)
