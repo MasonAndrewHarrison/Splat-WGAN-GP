@@ -6,6 +6,8 @@ from torchvision import transforms
 import os
 import shutil
 
+#TODO why is the img in dataset_image in 64466
+
 os.makedirs("dataset_images/all", exist_ok=True)
 
 print("Downloading data.")
@@ -18,7 +20,6 @@ print("Filtering data. May take some time.")
 transform = transforms.Compose([transforms.ToTensor(),])
 dataset = ImageFolder(root='temp', transform=transform)
 
-image = 0
 true_image_index = 0
 
 for i, (image,_) in enumerate(dataset):
@@ -35,7 +36,8 @@ for i, (image,_) in enumerate(dataset):
         if torch.equal(first_pixel, target) and torch.equal(last_pixel, target):
 
             true_image_index += 1
-            save_image(image, f"dataset_images/all/img{i}.png")
+            save_image(image, f"dataset_images/all/img{true_image_index}.png")
 
 shutil.rmtree("temp/")
 print("Finished :)")
+
