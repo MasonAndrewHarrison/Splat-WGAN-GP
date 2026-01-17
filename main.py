@@ -15,7 +15,7 @@ for uid, filepath in objects.items():
     print(filepath)
 
 
-    point_cloud = pc.mesh_to_pc(filepath, 1000)
+    point_cloud = pc.mesh_to_pc(filepath, 3000)
     print(point_cloud.shape)
 
     render.show_model(point_cloud)

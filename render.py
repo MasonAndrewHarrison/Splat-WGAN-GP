@@ -19,7 +19,7 @@ def show_model(point_cloud):
         vis.add_geometry(pcd_list)
     
         render_option = vis.get_render_option()
-        render_option.point_size = 15.0 
+        render_option.point_size = 30.0
         
         vis.run()
         vis.destroy_window()

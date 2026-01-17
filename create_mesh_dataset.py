@@ -4,7 +4,7 @@ import re
 
 uids = objaverse.load_uids()
 
-search_subset = uids[:50]
+search_subset = uids[:50000]
 annotations = objaverse.load_annotations(search_subset)
 
 CAR_KEYWORDS = {

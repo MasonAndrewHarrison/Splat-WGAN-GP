@@ -17,9 +17,13 @@
    (Windows Power Shell)`venv\Scripts\Activate.ps1`
    
 7. Install PyTorch:\
-   (For CUDA)`pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu130`\
+   (For CUDA)`pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu121`\
    (For CPU)`pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu`
-   
+
+8. Install PyG:\
+   (For CUDA)`pip install torch-scatter torch-sparse torch-cluster torch-spline-conv \-f https://data.pyg.org/whl/torch-2.5.0+cu121.html`
+   (For CPU)`pip install torch-scatter torch-sparse torch-cluster torch-spline-conv \-f https://data.pyg.org/whl/torch-2.5.0+cpu.html`
+
 9. Install dependencies:\
    `pip install -r requirements.txt`
 
