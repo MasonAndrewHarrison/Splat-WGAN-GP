@@ -1,5 +1,5 @@
-##**Make sure you have python version <=3.12.11.**
-`/home/mason/.pyenv/versions/3.12.11/bin/python -m venv .venv`
+**Make sure you have python version <=3.12.11.**
+   `/home/mason/.pyenv/versions/3.12.11/bin/python -m venv .venv`
 
 ## Installation
 1. Clone this repository:\
