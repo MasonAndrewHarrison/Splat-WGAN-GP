@@ -4,9 +4,8 @@ from torch_geometric.nn import EdgeConv, knn_graph
 import render
 
 class Generator(nn.Module):
-    def __init__(self, latent_dim, features, num_points, out_dim, k=20):
+    def __init__(self, latent_dim, features, num_points, out_dim):
         super(Generator, self).__init__()
-        self.k = k
         self.features = features
 
         self.layer1 = nn.Sequential(
@@ -15,7 +14,7 @@ class Generator(nn.Module):
             nn.Unflatten(1, (features, num_points)),
         )
 
-    def _graphConvBlock(self, x, in_dim, out_dim):
+    def _graphConvBlock(self, x, in_dim, out_dim, k, final_layer=False):
 
         B, C, N = x.shape
 
@@ -28,7 +27,7 @@ class Generator(nn.Module):
             for i in range(B)
         ])
 
-        edge_index = knn_graph(pos_flat, k=self.k, batch=batch)
+        edge_index = knn_graph(pos_flat, k=k, batch=batch)
         x_flat = x.permute(0, 2, 1).reshape(B * N, C)
     
         mlp = nn.Sequential(
@@ -40,15 +39,19 @@ class Generator(nn.Module):
         edge_conv = EdgeConv(mlp, aggr="max")
         out_flat =  edge_conv(x_flat, edge_index)
 
-        return out_flat.view(B, N, out_dim)
+        if final_layer is False:
+            return out_flat.view(B, out_dim, N)
+        else:
+            return out_flat.view(B, N, out_dim)
 
 
     def forward(self, x):
 
         x = self.layer1(x)
-        return self._graphConvBlock(x, 3, 6)
-
-
+        print(x.shape)
+        x = self._graphConvBlock(x, 3, 6, k=20)
+        print(x.shape)
+        return self._graphConvBlock(x, 6, 12, k=20, final_layer=True)
 
 
 if __name__ == "__main__":
