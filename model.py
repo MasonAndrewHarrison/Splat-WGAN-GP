@@ -101,11 +101,16 @@ class PC_Critic(nn.Module):
         return out_flat.view(B, -1, N)
 
     def forward(self, x):
+        
         x = x.permute(0, 2, 1)
+
         x = self._graphConvBlock(x, self.edge_conv1, k=30)
         x = self._graphConvBlock(x, self.edge_conv2, k=20)
         x = self._graphConvBlock(x, self.edge_conv3, k=10) 
-        x = x.squeeze()
+
+        batch_size = x.shape[0]
+        x = x.view(batch_size, -1)
+
         return self.final_layer(x)
 
 def initialize_weight(model):
@@ -126,12 +131,11 @@ if __name__ == "__main__":
     generator = Generator(100, 8, 3072, 6)
     initialize_weight(generator)
     out = generator(latent)
-    print(out.shape)
-
     render.show_model(out[0].detach().numpy())
 
     critic = PC_Critic(8, 3072, 6)
     initialize_weight(critic)
+    print(out.shape)
     score = critic(out)
     print(score.shape)
 
