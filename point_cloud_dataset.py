@@ -10,18 +10,41 @@ class Dataset():
         self.transform=transform
 
         with open(uid_filepath, "r") as f:
-            uids = [line.strip() for line in f]
-
-        self.objects = list(objaverse.load_objects(uids=uids).items())
+            self.uids = [line.strip() for line in f]
     
     def __len__(self):
 
-        return len(self.objects)
+        return len(self.uids)
 
     def __getitem__(self, idx):
 
-        uids, filepath = self.objects[idx]
+        uid = self.uids[idx]
 
-        point_cloud = pc.mesh_to_pc(filepath, self.n_points)
+        try:
 
-        return self.transform(point_cloud)
+            objects = objaverse.load_objects(uids=[uids])
+
+            if uid not in objects:
+                raise ValueError(f"Failed to get UID: {uid}")
+
+            filepath = objects[uid]
+
+            uids, filepath = objects[idx]
+
+            point_cloud = pc.mesh_to_pc(filepath, self.n_points)
+            point_cloud = torch.from_numpy(point_cloud).float16()
+
+            render.show_model(point_cloud)
+            return self.transform(point_cloud)
+
+        except Exception as e:
+
+            print(f"Error loading {uid}: {e}")
+            return torch.randn(self.n_points, 6)
+
+
+class PointCloudNormalize:
+    def __call__(self, pc):
+
+        #TODO normalize pc here
+        return pc

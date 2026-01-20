@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader, Dataset
-from torchvision import datasets, transforms
+from torchvision import datasets, transforms 
 import random
 import objaverse
 import numpy as np
@@ -15,15 +15,15 @@ from model import Generator, PC_Critic
 import point_cloud_dataset as pcd
 
 n_points = 3072
-latent_dim = 256 
+latent_dim = 256
+batch_size = 64
 
 transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
 dataset = pcd.Dataset("model_uids.txt", 3072, transform=transform)
-out = dataset[0]
-print(out.shape, type(out))
+loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 '''latent = torch.randn(10, latent_dim)
 generator = Generator(latent_dim, 64, n_points, 6)
