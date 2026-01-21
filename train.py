@@ -7,39 +7,65 @@ from torchvision.utils import save_image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import datasets, transforms 
 import random
-import objaverse
-import numpy as np
 import point_cloud as pc
 import render
-from model import Generator, PC_Critic
+from model import Generator, PC_Critic, initialize_weight
 import point_cloud_dataset as pcd
+import torch.optim as optim
+import os
 
-n_points = 3072
-latent_dim = 256
-batch_size = 64
 
-transform = transforms.Compose([
-    transforms.ToTensor(),
-])
+def main():
 
-dataset = pcd.Dataset("model_uids.txt", 3072, transform=transform)
-loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
 
-'''latent = torch.randn(10, latent_dim)
-generator = Generator(latent_dim, 64, n_points, 6)
-out = generator(latent)
-out = out[0].detach().numpy()
-render.show_model(out)
+    n_points = 3072
+    latent_dim = 256
+    batch_size = 64
+    epochs = 10
 
-critic = PC_Critic(64, n_points, 6)
+    transform = pcd.PointCloudNormalize()
 
-for uid, filepath in objects.items():
+    dataset = pcd.Dataset(
+        "model_uids.txt", 3072, 
+        transform=transform, 
+        value_type=torch.float32
+    )
+    print(dataset.__len__())
+    print(dataset[327].shape)
 
-    point_cloud = pc.mesh_to_pc(filepath, n_points)
+    loader = DataLoader(
+        dataset, 
+        batch_size=batch_size, 
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
+        prefetch_factor=2,
+        persistent_workers=True
+    )
 
-    render.show_model(point_cloud)
-    pc1 = torch.tensor(point_cloud, dtype=torch.float32).unsqueeze(0)
-    critic.eval()
-    with torch.no_grad():
-        score = critic(pc1)
-        print(score.squeeze().item())'''
+    fixed_latent = torch.randn(10, latent_dim)
+
+    generator = Generator(latent_dim, 64, n_points, 6)
+    critic = PC_Critic(64, n_points, 6)
+
+    if os.path.exists("Generator.pth"):
+        generator.load_state_dict(torch.load("Generator.pth", map_location=device))
+        generator.to(device)
+
+    else:
+        initialize_weight(generator)
+
+    opt_critic = optim.Adam(generator.parameters(), lr=1e-4, betas=(0.0, 0.9))
+    opt_gen = optim.Adam(critic.parameters(), lr=4e-4, betas=(0.0, 0.9))
+
+    for epoch in range(epochs):
+        for idx, real in enumerate(loader):
+
+            pc = real[1].detach().numpy()
+            print(pc.shape)
+            render.show_model(pc)
+
+if __name__ == "__main__":
+    main()

@@ -4,10 +4,11 @@ import objaverse
 import render
 
 class Dataset():
-    def __init__(self, uid_filepath, n_points, transform):
+    def __init__(self, uid_filepath, n_points, transform, value_type):
 
         self.n_points=n_points
         self.transform=transform
+        self.value_type=value_type
 
         with open(uid_filepath, "r") as f:
             self.uids = [line.strip() for line in f]
@@ -22,19 +23,15 @@ class Dataset():
 
         try:
 
-            objects = objaverse.load_objects(uids=[uids])
-
+            objects = objaverse.load_objects(uids=[uid])
+        
             if uid not in objects:
                 raise ValueError(f"Failed to get UID: {uid}")
 
             filepath = objects[uid]
-
-            uids, filepath = objects[idx]
-
             point_cloud = pc.mesh_to_pc(filepath, self.n_points)
-            point_cloud = torch.from_numpy(point_cloud).float16()
+            point_cloud = torch.from_numpy(point_cloud).to(self.value_type)
 
-            render.show_model(point_cloud)
             return self.transform(point_cloud)
 
         except Exception as e:
@@ -43,7 +40,7 @@ class Dataset():
             return torch.randn(self.n_points, 6)
 
 
-class PointCloudNormalize:
+class PointCloudNormalize():
     def __call__(self, pc):
 
         #TODO normalize pc here
