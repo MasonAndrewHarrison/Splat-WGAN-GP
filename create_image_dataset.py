@@ -6,7 +6,6 @@ from torchvision import transforms
 import os
 import shutil
 
-#TODO why is the img in dataset_image in 64466
 
 os.makedirs("dataset_images/all", exist_ok=True)
 

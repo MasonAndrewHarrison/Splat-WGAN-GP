@@ -3,6 +3,8 @@ import re
 import point_cloud as pc
 import numpy as np
 
+n_points = 3072
+
 
 uids = objaverse.load_uids()
 
@@ -32,9 +34,9 @@ for uid, anno in annotations.items():
                 raise ValueError(f"Failed to get UID: {uid}")
 
             filepath = objects[uid]
-            point_cloud = pc.mesh_to_pc(filepath, 3000)
+            point_cloud = pc.mesh_to_pc(filepath, n_points)
 
-            point_cloud_dataset.append(point_cloud)
+            point_cloud_dataset.append(point_cloud.astype(np.float16))
             print(uid)
 
         except Exception as e:

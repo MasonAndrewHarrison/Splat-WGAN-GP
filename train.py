@@ -28,9 +28,8 @@ def main():
     transform = pcd.PointCloudNormalize()
 
     dataset = pcd.Dataset(
-        "model_uids.txt", 3072, 
+        "point_cloud_dataset.npy",
         transform=transform, 
-        value_type=torch.float32
     )
 
     loader = DataLoader(

@@ -2,16 +2,16 @@ import objaverse
 import numpy as np
 import point_cloud as pc
 import render
+import point_cloud_dataset as pcd
+import torch
 
 
-N_POINTS = 1000
+transforms = pcd.PointCloudNormalize()
+
+dataset = pcd.Dataset("point_cloud_dataset.npy", transforms)
+
+tensor = dataset[5]
 
 
-point_cloud_dataset = np.load("point_cloud_dataset.npy")
-print(type(point_cloud_dataset))
-
-for point_cloud in point_cloud_dataset:
-
-    render.show_model(point_cloud)
-
+print(type(tensor))
 

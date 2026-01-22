@@ -1,43 +1,32 @@
 import torch
 import point_cloud as pc
 import objaverse
+import numpy as np
 import render
 
 class Dataset():
-    def __init__(self, uid_filepath, n_points, transform, value_type):
+    def __init__(self, filepath, transform):
 
-        self.n_points=n_points
-        self.transform=transform
-        self.value_type=value_type
-
-        with open(uid_filepath, "r") as f:
-            self.uids = [line.strip() for line in f]
+        self.filepath = filepath
+        self.transform = transform
     
     def __len__(self):
 
-        return len(self.uids)
+        point_cloud_dataset = np.load(self.filepath, mmap_mode="r")
+        return len(point_cloud_dataset)
 
     def __getitem__(self, idx):
 
-        uid = self.uids[idx]
+        point_cloud_dataset = np.load(self.filepath, mmap_mode="r")
+        point_cloud = point_cloud_dataset[idx].copy()
 
-        try:
+        tensor_pc = torch.from_numpy(point_cloud)
 
-            objects = objaverse.load_objects(uids=[uid])
-        
-            if uid not in objects:
-                raise ValueError(f"Failed to get UID: {uid}")
+        if self.transform:
+            tensor_pc = self.transform(tensor_pc)
 
-            filepath = objects[uid]
-            point_cloud = pc.mesh_to_pc(filepath, self.n_points)
-            point_cloud = torch.from_numpy(point_cloud).to(self.value_type)
+        return tensor_pc
 
-            return self.transform(point_cloud)
-
-        except Exception as e:
-
-            print(f"Error loading {uid}: {e}")
-            return torch.randn(self.n_points, 6)
 
 
 class PointCloudNormalize():
