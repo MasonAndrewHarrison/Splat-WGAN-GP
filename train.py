@@ -32,17 +32,15 @@ def main():
         transform=transform, 
         value_type=torch.float32
     )
-    print(dataset.__len__())
-    print(dataset[327].shape)
 
     loader = DataLoader(
         dataset, 
         batch_size=batch_size, 
         shuffle=True,
-        num_workers=4,
-        pin_memory=True,
-        prefetch_factor=2,
-        persistent_workers=True
+        #num_workers=0,
+        #pin_memory=True,
+        #prefetch_factor=2,
+        #persistent_workers=True
     )
 
     fixed_latent = torch.randn(10, latent_dim)
@@ -61,11 +59,12 @@ def main():
     opt_gen = optim.Adam(critic.parameters(), lr=4e-4, betas=(0.0, 0.9))
 
     for epoch in range(epochs):
+        print(epoch)
         for idx, real in enumerate(loader):
 
             pc = real[1].detach().numpy()
             print(pc.shape)
-            render.show_model(pc)
+            #render.show_model(pc)
 
 if __name__ == "__main__":
     main()
