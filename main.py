@@ -6,16 +6,12 @@ import render
 
 N_POINTS = 1000
 
-with open("model_uids.txt", "r") as f:
-    uids = [line.strip() for line in f]
 
-objects = objaverse.load_objects(uids=uids)
+point_cloud_dataset = np.load("point_cloud_dataset.npy")
+print(type(point_cloud_dataset))
 
-for uid, filepath in objects.items():
-    print(filepath)
+for point_cloud in point_cloud_dataset:
+
+    render.show_model(point_cloud)
 
 
-    point_cloud = pc.mesh_to_pc(filepath, 3072)
-    print(point_cloud.shape)
-
-    #render.show_model(point_cloud)

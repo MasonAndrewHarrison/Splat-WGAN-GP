@@ -6,3 +6,4 @@ dataset_images/
 dataset_point_clouds/
 test.py
 temp/
+*.npy
