@@ -1,8 +1,10 @@
 import open3d as o3d
+import torch
 
 def show_model(point_cloud):
 
-    
+    if isinstance(point_cloud, torch.Tensor):
+        point_cloud = point_cloud.detach().numpy()
 
     if point_cloud is None:
         raise ValueError("Array is empty")
