@@ -39,12 +39,12 @@ def main():
         batch_size=batch_size, 
         shuffle=True,
         #num_workers=0,
-        #pin_memory=True,
+        pin_memory=True,
         #prefetch_factor=2,
         #persistent_workers=True
     )
 
-    fixed_latent = torch.randn(10, latent_dim)
+    fixed_latent = torch.randn(10, latent_dim).to(device)
 
     generator = Generator(latent_dim, 64, n_points, 6)
     critic = PC_Critic(64, n_points, 6)
@@ -53,15 +53,24 @@ def main():
         generator.load_state_dict(torch.load("Generator.pth", map_location=device))
         generator.to(device)
 
-    else:
+    else:   
         initialize_weight(generator)
 
-    opt_critic = optim.Adam(generator.parameters(), lr=1e-4, betas=(0.0, 0.9))
-    opt_gen = optim.Adam(critic.parameters(), lr=4e-4, betas=(0.0, 0.9))
+    if os.path.exists("Critic.pth"):
+        critic.load_state_dict(torch.load("Critic.pth", map_location=device))
+        critic.to(device)
+    
+    else:
+        initialize_weight(critic)
+
+    generator.to(device)
+    critic.to(device)
+
+    opt_gen = optim.Adam(generator.parameters(), lr=4e-4, betas=(0.0, 0.9))
+    opt_critic = optim.Adam(critic.parameters(), lr=1e-4, betas=(0.0, 0.9))
 
     for epoch in range(epochs):
         print(epoch)
-        #TODO fix issue with either current_batch_size or with the second epoch idk
         for idx, real in enumerate(loader):
 
             real = real.to(device).float()
@@ -70,10 +79,10 @@ def main():
 
             for _ in range(critic_iterations):
 
-                latent_space = torch.randn(current_batch_size, latent_dim)
+                latent_space = torch.randn(current_batch_size, latent_dim).to(device)
                 fake = generator(latent_space)
 
-                fake_score = critic(fake)
+                fake_score = critic(fake.detach())
                 real_score = critic(real) 
 
                 loss_critic = -(torch.mean(real_score)-torch.mean(fake_score))
@@ -84,10 +93,12 @@ def main():
                 for p in critic.parameters():
                     p.data.clamp_(-weight_clip, weight_clip)
 
-            latent_space = torch.randn(current_batch_size, latent_dim)
+            latent_space = torch.randn(current_batch_size, latent_dim).to(device)
             fake_pc = generator(latent_space)
+
             score = critic(fake_pc)
             loss_gen = -torch.mean(score)
+
             generator.zero_grad()
             loss_gen.backward()
             opt_gen.step()
@@ -97,6 +108,10 @@ def main():
 
             if idx % 10 == 0:
                 render.show_model(fake_pc[0])
+
+            if idx % 5 == 0:
+                torch.save(generator.state_dict(), "Generator.pth")
+                torch.save(critic.state_dict(), "Critic.pth")
 
 
 

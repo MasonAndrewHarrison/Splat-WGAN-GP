@@ -7,3 +7,4 @@ dataset_point_clouds/
 test.py
 temp/
 *.npy
+*.pth
