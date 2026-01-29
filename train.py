@@ -22,7 +22,7 @@ def main():
 
     n_points = 3072
     latent_dim = 256
-    batch_size = 64
+    batch_size = 12
     critic_iterations = 5
     epochs = 10
     weight_clip = 0.01
@@ -61,10 +61,12 @@ def main():
 
     for epoch in range(epochs):
         print(epoch)
+        #TODO fix issue with either current_batch_size or with the second epoch idk
         for idx, real in enumerate(loader):
 
             real = real.to(device).float()
             current_batch_size,_,_ = real.shape
+            print(current_batch_size)
 
             for _ in range(critic_iterations):
 
@@ -72,7 +74,6 @@ def main():
                 fake = generator(latent_space)
 
                 fake_score = critic(fake)
-                print(fake.shape, real.shape)
                 real_score = critic(real) 
 
                 loss_critic = -(torch.mean(real_score)-torch.mean(fake_score))
@@ -93,6 +94,9 @@ def main():
 
             if idx % 1 == 0:
                 print(f"print gen loss: {loss_gen} || print critic loss: {loss_critic}")
+
+            if idx % 10 == 0:
+                render.show_model(fake_pc[0])
 
 
 
