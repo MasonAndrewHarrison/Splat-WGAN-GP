@@ -3,10 +3,10 @@
 
 ## Installation
 1. Clone this repository:\
-   `git clone https://github.com/MasonAndrewHarrison/Face-Generator.git`
+   `git clone https://github.com/MasonAndrewHarrison/Splat-WGAN-GP.git`
 
 2. Change Directory:\
-   `cd Face-Generator`
+   `cd Splat-WGAN-GP`
       
 4. Create virtual environment:\
    `python -m venv venv`
