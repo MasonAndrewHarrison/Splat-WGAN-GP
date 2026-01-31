@@ -1,6 +1,7 @@
 model_uids.txt
 __pycache__/
 .venv/
+venv/
 dataset/
 dataset_images/
 dataset_point_clouds/
@@ -8,3 +9,4 @@ test.py
 temp/
 *.npy
 *.pth
+pytorch/

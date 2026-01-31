@@ -18,7 +18,7 @@ import os
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = "cpu"
+    #device = "cpu"
 
     n_points = 3072
     latent_dim = 256
@@ -63,7 +63,7 @@ def main():
     else:
         initialize_weight(critic)
 
-    generator.to(device)
+    generator.to(device) 
     critic.to(device)
 
     opt_gen = optim.Adam(generator.parameters(), lr=4e-4, betas=(0.0, 0.9))

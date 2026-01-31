@@ -7,7 +7,7 @@ def show_model(point_cloud):
         point_cloud = point_cloud.detach().numpy()
 
     if point_cloud is None:
-        raise ValueError("Array is empty")
+        raise ValueError("Array is empty") 
 
     else:
         pcd_list = o3d.geometry.PointCloud()

@@ -6,12 +6,15 @@ import point_cloud_dataset as pcd
 import torch
 
 
-transforms = pcd.PointCloudNormalize()
+import subprocess
+result = subprocess.run([
+    "bash", "-c", 
+    "source ~/TripoSR-fixed/venv/bin/activate && "
+    "cd ~/TripoSR-fixed && "
+    "python run.py examples/chair.png --output-dir output/test"
+], capture_output=True, text=True)
 
-dataset = pcd.Dataset("point_cloud_dataset.npy", transforms)
+print("Success:", result.returncode == 0)
+print("Mesh at: ~/TripoSR-fixed/output/test/0/mesh.obj")
 
-tensor = dataset[5]
-
-
-print(type(tensor))
 
