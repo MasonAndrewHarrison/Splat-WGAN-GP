@@ -1,117 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import EdgeConv, knn_graph
 import render
 
-class Generator(nn.Module):
+#TODO create a PointNet (Point-wise MLPs) Model
+#TODO PointNet with knn with pointnet2_ops for knn gpu support
+#TODO look into using transformers and PointNet maybe?
 
-    def __init__(self, latent_dim, features, num_points, out_dim):
-        super(Generator, self).__init__()
-
-        self.layer1 = nn.Sequential(
-            nn.Linear(latent_dim, num_points * 6),
-            nn.Unflatten(1, (6, num_points)),
-        )
-
-        self.edge_conv1 = EdgeConv(self._create_mlp(6*2, features, 6), aggr="max")
-        self.edge_conv2 = EdgeConv(self._create_mlp(6*2, features, 6), aggr="max")
-        self.edge_conv3 = EdgeConv(self._create_mlp(6*2, features, out_dim), aggr="max")
-
-    def _create_mlp(self, in_dim, hidden_dim, out_dim):
-
-        return nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
-            nn.BatchNorm1d(hidden_dim),
-            nn.LeakyReLU(0.2),
-            nn.Linear(hidden_dim, out_dim),
-        )
-
-    def _graphConvBlock(self, x, edge_conv, k, final_layer=False):
-
-        B, C, N = x.shape
-
-        pos = x[:, :3, :]
-        pos = pos.permute(0, 2, 1)
-        pos_flat = pos.reshape(B * N, 3)
-
-        batch = torch.arange(B, device=x.device).repeat_interleave(N)
-
-        edge_index = knn_graph(pos_flat, k=k, batch=batch)
-        x_flat = x.permute(0, 2, 1).reshape(B * N, C)
-        out_flat = edge_conv(x_flat, edge_index)
-
-        if final_layer is False:
-            return out_flat.view(B, -1, N)
-        else:
-            return out_flat.view(B, N, -1)
-
-    def forward(self, x):
-
-        x = self.layer1(x)
-        x = self._graphConvBlock(x, self.edge_conv1, k=10)
-        x = self._graphConvBlock(x, self.edge_conv2, k=20)
-        x = self._graphConvBlock(x, self.edge_conv3, k=30, final_layer=True)
-
-        output = torch.cat([
-            x[:, :, :3],
-            F.tanh(x[:, :, 3:]),
-        ], dim=2)
-
-        return output
-
-class PC_Critic(nn.Module):
-    def __init__(self, features, point_num, in_dim):
-        super(PC_Critic, self).__init__()
-
-        self.edge_conv1 = EdgeConv(self._create_mlp(in_dim*2, features, 3), aggr="max")
-        self.edge_conv2 = EdgeConv(self._create_mlp(3*2, features, 2), aggr="max")
-        self.edge_conv3 = EdgeConv(self._create_mlp(2*2, features, 1), aggr="max")
-        
-        self.final_layer = nn.Sequential(
-            nn.Linear(point_num, features*4),
-            nn.BatchNorm1d(features*4), 
-            nn.LeakyReLU(0.2),
-            nn.Linear(features*4, features*2),
-            nn.LeakyReLU(0.2),
-            nn.Linear(features*2, features),
-            nn.LeakyReLU(0.2),
-            nn.Linear(features, 1),
-        )
-
-    def _create_mlp(self, in_dim, hidden_dim, out_dim):
-
-        return nn.Sequential(
-            nn.Linear(in_dim, hidden_dim),
-            nn.BatchNorm1d(hidden_dim),
-            nn.LeakyReLU(0.2),
-            nn.Linear(hidden_dim, out_dim),
-        )
-
-    def _graphConvBlock(self, x, edge_conv, k, final_layer=False):
-
-        B, C, N = x.shape
-        x_flat = x.permute(0, 2, 1).reshape(B * N, C)
-
-        batch = torch.arange(B, device=x.device).repeat_interleave(N)
-
-        edge_index = knn_graph(x_flat, k=k, batch=batch)
-        out_flat = edge_conv(x_flat, edge_index)
-
-        return out_flat.view(B, -1, N)
-
-    def forward(self, x):
-        
-        x = x.permute(0, 2, 1)
-
-        x = self._graphConvBlock(x, self.edge_conv1, k=30)
-        x = self._graphConvBlock(x, self.edge_conv2, k=20)
-        x = self._graphConvBlock(x, self.edge_conv3, k=10) 
-
-        batch_size = x.shape[0]
-        x = x.view(batch_size, -1)
-
-        return self.final_layer(x)
 
 def initialize_weight(model):
 
@@ -123,33 +18,3 @@ def initialize_weight(model):
         elif isinstance(m, nn.BatchNorm1d):
             nn.init.constant_(m.weight.data, 1.0)
             nn.init.constant_(m.bias.data, 0.0)
-
-if __name__ == "__main__":
-
-    latent = torch.randn(10, 100)
-
-    generator = Generator(100, 8, 3072, 6)
-    initialize_weight(generator)
-    out = generator(latent)
-    render.show_model(out[0].detach().numpy())
-
-    critic = PC_Critic(8, 3072, 6)
-    initialize_weight(critic)
-    print(out.shape)
-    score = critic(out)
-    print(score.shape)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

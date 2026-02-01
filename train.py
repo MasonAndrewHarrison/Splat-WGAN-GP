@@ -18,11 +18,11 @@ import os
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #device = "cpu"
+    device = "cpu"
 
     n_points = 3072
     latent_dim = 256
-    batch_size = 12
+    batch_size = 4
     critic_iterations = 5
     epochs = 10
     weight_clip = 0.01
@@ -39,7 +39,7 @@ def main():
         batch_size=batch_size, 
         shuffle=True,
         #num_workers=0,
-        pin_memory=True,
+        #pin_memory=True,
         #prefetch_factor=2,
         #persistent_workers=True
     )
