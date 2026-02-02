@@ -57,7 +57,6 @@ class PC_Critic(nn.Module):
         layers.append(nn.Dropout(p=0.25))
         return nn.Sequential(*layers)
 
-
     def forward(self, x):
         out = self.point_wise_mpls(x)
         out_max = torch.max(out, 2)[0]
