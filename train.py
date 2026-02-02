@@ -26,6 +26,8 @@ def main():
     critic_iterations = 5
     epochs = 10
     weight_clip = 0.01
+    features = 32
+    pc_dim = 3
 
     transform = pcd.PointCloudNormalize()
 
@@ -46,8 +48,8 @@ def main():
 
     fixed_latent = torch.randn(10, latent_dim).to(device)
 
-    generator = Generator(latent_dim, 64, n_points, 6)
-    critic = PC_Critic(64, n_points, 6)
+    generator = Generator(latent_dim, features, n_points, pc_dim)
+    critic = PC_Critic(features, pc_dim)
 
     if os.path.exists("Generator.pth"):
         generator.load_state_dict(torch.load("Generator.pth", map_location=device))
@@ -74,6 +76,7 @@ def main():
         for idx, real in enumerate(loader):
 
             real = real.to(device).float()
+            real = real.permute(0, 2, 1)
             current_batch_size,_,_ = real.shape
             print(current_batch_size)
 
@@ -107,6 +110,7 @@ def main():
                 print(f"print gen loss: {loss_gen} || print critic loss: {loss_critic}")
 
             if idx % 10 == 0:
+                print(fake.shape)
                 render.show_model(fake_pc[0])
 
             if idx % 5 == 0:
