@@ -6,7 +6,7 @@ import point_cloud_dataset as pcd
 import torch
 
 
-#TODO get this to use TriplaneGausian instead
+#TODO get this to use TriplaneGausian instead or LGM 10GB
 #TODO make or find a gausian render
 #TODO make a gausian render in c/c++
 
