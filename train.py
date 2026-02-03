@@ -18,8 +18,7 @@ import os
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    #device = "cpu"
-
+    transform = pcd.PointCloudNormalize()
     n_points = 3072
     latent_dim = 64
     batch_size = 64
@@ -28,7 +27,7 @@ def main():
     weight_clip = 0.01
     features = 32
     pc_dim = 6
-    transform = pcd.PointCloudNormalize()
+    
 
     dataset = pcd.Dataset(
         "point_cloud_dataset.npy",
@@ -41,7 +40,7 @@ def main():
         shuffle=True,
         num_workers=4,
         pin_memory=True,
-        prefetch_factor=2,
+        prefetch_factor=3,
         persistent_workers=True
     )
 
@@ -67,7 +66,7 @@ def main():
     generator.to(device) 
     critic.to(device)
 
-    opt_gen = optim.Adam(generator.parameters(), lr=4e-4, betas=(0.0, 0.9))
+    opt_gen = optim.Adam(generator.parameters(), lr=4e-3, betas=(0.0, 0.9))
     opt_critic = optim.Adam(critic.parameters(), lr=1e-4, betas=(0.0, 0.9))
 
     for epoch in range(epochs):
@@ -112,7 +111,7 @@ def main():
                 torch.save(generator.state_dict(), "Generator.pth")
                 torch.save(critic.state_dict(), "Critic.pth")
 
-            if epoch % 50 == 0 and idx == 0:
+            if epoch % 100 == 0 and idx == 0:
                 render.show_model(fake_pc[0])
 
 
