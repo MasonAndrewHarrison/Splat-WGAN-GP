@@ -6,7 +6,7 @@ import numpy as np
 n_points = 3072
 
 uids = objaverse.load_uids()
-search_subset = uids[:50000]
+search_subset = uids[:500000]
 annotations = objaverse.load_annotations(search_subset)
 
 CAR_KEYWORDS = {
@@ -17,7 +17,8 @@ CAR_KEYWORDS = {
 
 point_cloud_dataset = []
 
-for uid, anno in annotations.items():
+usable_idx = 0
+for idx, (uid, anno) in enumerate(annotations.items()):
     name = anno.get('name', '').lower()
 
     tokens = set(re.findall(r"[a-z]+", name.lower()))
@@ -34,8 +35,9 @@ for uid, anno in annotations.items():
             filepath = objects[uid]
             point_cloud = pc.mesh_to_pc(filepath, n_points)
 
+            usable_idx += 1
             point_cloud_dataset.append(point_cloud.astype(np.float16))
-            print(uid)
+            print(f"{usable_idx} || {idx} / {len(annotations.items())} || {(100* idx / len(annotations.items())):.2f}% || {uid}")
 
         except Exception as e:
 

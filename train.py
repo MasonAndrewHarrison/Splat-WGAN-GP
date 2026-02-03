@@ -18,11 +18,11 @@ import os
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = "cpu"
+    #device = "cpu"
 
     n_points = 3072
-    latent_dim = 256
-    batch_size = 4
+    latent_dim = 64
+    batch_size = 64
     critic_iterations = 5
     epochs = 10
     weight_clip = 0.01
@@ -40,10 +40,10 @@ def main():
         dataset, 
         batch_size=batch_size, 
         shuffle=True,
-        #num_workers=0,
-        #pin_memory=True,
-        #prefetch_factor=2,
-        #persistent_workers=True
+        num_workers=4,
+        pin_memory=True,
+        prefetch_factor=2,
+        persistent_workers=True
     )
 
     fixed_latent = torch.randn(10, latent_dim).to(device)
@@ -72,13 +72,11 @@ def main():
     opt_critic = optim.Adam(critic.parameters(), lr=1e-4, betas=(0.0, 0.9))
 
     for epoch in range(epochs):
-        print(epoch)
         for idx, real in enumerate(loader):
 
             real = real.to(device).float()
             real = real.permute(0, 2, 1)
             current_batch_size,_,_ = real.shape
-            print(current_batch_size)
 
             for _ in range(critic_iterations):
 
@@ -107,13 +105,13 @@ def main():
             opt_gen.step()
 
             if idx % 1 == 0:
-                print(f"print gen loss: {loss_gen} || print critic loss: {loss_critic}")
+                print(f"Epoch: {epoch} of {epochs} || print gen loss: {loss_gen:.4f} || print critic loss: {loss_critic:.4f}")
 
             if idx % 10 == 0:
-                print(fake.shape)
                 render.show_model(fake_pc[0])
 
             if idx % 5 == 0:
+                print("Saved")
                 torch.save(generator.state_dict(), "Generator.pth")
                 torch.save(critic.state_dict(), "Critic.pth")
 

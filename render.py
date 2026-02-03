@@ -5,7 +5,7 @@ import numpy as np
 def show_model(point_cloud):
 
     if isinstance(point_cloud, torch.Tensor):
-        point_cloud = point_cloud.detach().numpy()
+        point_cloud = point_cloud.cpu().detach().numpy()
         point_cloud = np.transpose(point_cloud, (1, 0))
         print(point_cloud.shape)
 
