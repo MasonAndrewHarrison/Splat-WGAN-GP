@@ -24,11 +24,10 @@ def main():
     latent_dim = 64
     batch_size = 64
     critic_iterations = 5
-    epochs = 10
+    epochs = 1000
     weight_clip = 0.01
     features = 32
-    pc_dim = 3
-
+    pc_dim = 6
     transform = pcd.PointCloudNormalize()
 
     dataset = pcd.Dataset(
@@ -72,6 +71,7 @@ def main():
     opt_critic = optim.Adam(critic.parameters(), lr=1e-4, betas=(0.0, 0.9))
 
     for epoch in range(epochs):
+
         for idx, real in enumerate(loader):
 
             real = real.to(device).float()
@@ -104,16 +104,16 @@ def main():
             loss_gen.backward()
             opt_gen.step()
 
-            if idx % 1 == 0:
+            if epoch % 1 == 0 and idx == 0:
                 print(f"Epoch: {epoch} of {epochs} || print gen loss: {loss_gen:.4f} || print critic loss: {loss_critic:.4f}")
 
-            if idx % 10 == 0:
-                render.show_model(fake_pc[0])
-
-            if idx % 5 == 0:
+            if epoch % 1 == 0 and idx == 0:
                 print("Saved")
                 torch.save(generator.state_dict(), "Generator.pth")
                 torch.save(critic.state_dict(), "Critic.pth")
+
+            if epoch % 50 == 0 and idx == 0:
+                render.show_model(fake_pc[0])
 
 
 
