@@ -24,7 +24,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     transform = pcd.PointCloudNormalize()
-    n_points = 3072
+    n_points = 512
     latent_dim = 64
     batch_size = 64
     critic_iterations = 5
@@ -70,8 +70,8 @@ def main():
     generator.to(device) 
     critic.to(device)
 
-    opt_gen = optim.Adam(generator.parameters(), lr=learning_rate, betas=(0.0, 0.999))
-    opt_critic = optim.Adam(critic.parameters(), lr=learning_rate, betas=(0.0, 0.999))
+    opt_gen = optim.Adam(generator.parameters(), lr=learning_rate, betas=(0.5, 0.9))
+    opt_critic = optim.Adam(critic.parameters(), lr=learning_rate, betas=(0.5, 0.9))
     scaler_generator = GradScaler(device.__str__())
     scaler_critic = GradScaler(device.__str__())
 
@@ -118,8 +118,7 @@ def main():
             scaler_generator.step(opt_gen)
             scaler_generator.update()
 
-
-            if epoch % 1 == 0 and idx == 0:
+            if epoch % 25 == 0 and idx == 0:
                 print("Saved")
                 torch.save(generator.state_dict(), "Generator.pth")
                 torch.save(critic.state_dict(), "Critic.pth")
