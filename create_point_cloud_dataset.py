@@ -6,7 +6,7 @@ import numpy as np
 n_points = 512
 
 uids = objaverse.load_uids()
-search_subset = uids[:90000]
+search_subset = uids[:50000]
 annotations = objaverse.load_annotations(search_subset)
 
 CAR_KEYWORDS = {

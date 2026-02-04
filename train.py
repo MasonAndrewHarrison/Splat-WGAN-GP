@@ -29,8 +29,8 @@ def main():
     batch_size = 64
     critic_iterations = 5
     epochs = 1000
-    lambda_GP = 10
-    features = 32
+    lambda_GP = 1
+    features = 64
     learning_rate = 1e-4
     pc_dim = 6
     
