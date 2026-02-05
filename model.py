@@ -16,11 +16,11 @@ class Generator(nn.Module):
         self.features = features
 
         self.linear_layers = nn.Sequential(
-            self._Linear_Block(latent_dim, features*4),
+            self._Linear_Block(latent_dim, features*4, use_layer_norm=False),
             self._Linear_Block(features*4, features*16, use_layer_norm=False),
-            self._Linear_Block(features*16, features*32),
+            self._Linear_Block(features*16, features*32, use_layer_norm=False),
             self._Linear_Block(features*32, features*64, use_layer_norm=False),
-            self._Linear_Block(features*64, num_points * features)
+            self._Linear_Block(features*64, num_points * features, use_layer_norm=False)
         ) 
 
         self.point_wise_mpls = nn.Sequential(
@@ -40,7 +40,7 @@ class Generator(nn.Module):
         if use_layer_norm:
             layers.append(nn.LayerNorm(out_channels))
         layers.append(nn.LeakyReLU(0.2, inplace=True))
-        layers.append(nn.Dropout(p=0.10))
+        #layers.append(nn.Dropout(p=0.05))
         return nn.Sequential(*layers)
 
     # Also called shared MLP
@@ -52,7 +52,7 @@ class Generator(nn.Module):
         ]
         if use_instance_norm:
             layers.append(nn.InstanceNorm1d(out_channels, affine=True)) 
-        layers.append(nn.ReLU(inplace=True))
+        layers.append(nn.LeakyReLU(0.2, inplace=True))
         return nn.Sequential(*layers)
 
     def forward(self, x):
@@ -87,6 +87,7 @@ class PC_Critic(nn.Module):
         
         return nn.Sequential(
             nn.Conv1d(in_channels, out_channels, 1),
+            nn.InstanceNorm1d(out_channels, affine=True),
             nn.ReLU(inplace=True)
         )
 
