@@ -1,11 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='torch.autograd')
-import matplotlib
-matplotlib.use('Qt5Agg') 
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-from torchvision.utils import save_image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import datasets, transforms 
 import random
@@ -16,7 +12,6 @@ import point_cloud_dataset as pcd
 import torch.optim as optim
 from utils import gradient_penalty
 from torch.amp import autocast, GradScaler
-import os
 
 
 def main():
@@ -26,14 +21,13 @@ def main():
     transform = pcd.PointCloudNormalize()
     n_points = 512
     latent_dim = 64
-    batch_size = 8
+    batch_size = 1
     critic_iterations = 5
     epochs = 10000
     lambda_GP = 10 
     features = 64
-    learning_rate = 1e-4
+    learning_rate = 5e-5
     pc_dim = 6
-    
 
     dataset = pcd.Dataset(
         "point_cloud_dataset.npy",
@@ -114,8 +108,6 @@ def main():
 
         if epoch % 1000 == 0:
             render.show_model(fake_pc[0])
-
-
 
 if __name__ == "__main__":
     main()
