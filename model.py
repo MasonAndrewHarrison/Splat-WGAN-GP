@@ -29,7 +29,10 @@ class Generator(nn.Module):
             self._Point_Wise_MLP(features*4, features*8),
         )
 
-        self.final_layer = nn.Conv1d(features*8, out_dim, 1)
+        self.final_layer = nn.Sequential(
+            nn.Conv1d(features*8, out_dim, 1),
+            nn.Tanh(),
+        )
 
     @staticmethod
     def _Linear_Block(in_channels, out_channels, use_layer_norm=True):
@@ -107,7 +110,17 @@ class PC_Critic(nn.Module):
         out = self.linear_layers(out)
         return out
 
-def initialize_weight(model):
+def init_generator(model):
+    for m in model.modules():
+        if isinstance(m, (nn.Linear, nn.Conv1d)):
+            if hasattr(m, 'final_layer'):
+                nn.init.normal_(m.weight, 0.0, 0.02) 
+            else:
+                nn.init.xavier_normal_(m.weight, gain=0.5) 
+            if m.bias is not None:
+                nn.init.constant_(m.bias.data, 0.0 if m.bias is not None else None)
+
+def init_critic(model):
 
     for m in model.modules():
         if isinstance(m, (nn.Linear, nn.Conv1d)):
@@ -122,9 +135,14 @@ if __name__ == '__main__':
     
     latent = torch.randn(1, 128)
     generator = Generator(128, features=32, num_points=1024, out_dim=6)
+    critic = PC_Critic(features=32, in_dim=6)
+
+    init_generator(generator)
+    init_critic(critic)
+
     point_cloud = generator(latent)
     print(point_cloud.shape)
-    critic = PC_Critic(features=32, in_dim=6)
+    
     out = critic(point_cloud)
     print(out.shape)
 

@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 import random
 import point_cloud as pc
 import render
-from model import Generator, PC_Critic, initialize_weight
+from model import Generator, PC_Critic, init_generator, init_critic
 import point_cloud_dataset as pcd
 import torch.optim as optim
 from utils import gradient_penalty
@@ -49,8 +49,8 @@ def main():
     generator = Generator(latent_dim, features, n_points, pc_dim)
     critic = PC_Critic(features, pc_dim)
 
-    initialize_weight(generator)
-    initialize_weight(critic)
+    init_generator(generator)
+    init_critic(critic)
 
     generator.to(device) 
     critic.to(device)
