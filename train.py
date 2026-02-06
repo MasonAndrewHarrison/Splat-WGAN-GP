@@ -25,13 +25,14 @@ def main():
 
     transform = pcd.PointCloudNormalize()
     n_points = 512
-    latent_dim = 64
+    latent_dim = 128
     batch_size = 64
-    critic_iterations = 5
-    epochs = 1000
+    critic_iterations = 3
+    epochs = 10000
     lambda_GP = 10 
     features = 64
-    learning_rate = 1e-4
+    learning_rate_critic = 5e-5
+    learning_rate_gen = 1e-4
     pc_dim = 6
     
 
@@ -70,8 +71,8 @@ def main():
     generator.to(device) 
     critic.to(device)
 
-    opt_gen = optim.Adam(generator.parameters(), lr=learning_rate, betas=(0.5, 0.9))
-    opt_critic = optim.Adam(critic.parameters(), lr=learning_rate, betas=(0.5, 0.9))
+    opt_gen = optim.Adam(generator.parameters(), lr=learning_rate_gen, betas=(0.5, 0.9))
+    opt_critic = optim.Adam(critic.parameters(), lr=learning_rate_critic, betas=(0.5, 0.9))
     scaler_generator = GradScaler(device.__str__())
     scaler_critic = GradScaler(device.__str__())
 
@@ -127,7 +128,7 @@ def main():
                 wasserstein_distance = torch.mean(real_score) - torch.mean(fake_score)
                 print(f"Epoch: {epoch} || Gen: {loss_gen:.4f} || Critic: {loss_critic:.4f} || W-dist: {wasserstein_distance:.4f} || GP: {gp:.4f}")
 
-            if epoch % 100 == 0 and idx == 0:
+            if epoch % 1000 == 0 and idx == 0:
                 render.show_model(fake_pc[0])
 
 

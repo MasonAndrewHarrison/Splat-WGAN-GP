@@ -21,7 +21,7 @@ def main():
     transform = pcd.PointCloudNormalize()
     n_points = 512
     latent_dim = 64
-    batch_size = 1
+    batch_size = 2
     critic_iterations = 5
     epochs = 10000
     lambda_GP = 10 
