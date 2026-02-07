@@ -5,14 +5,19 @@ def gradient_penalty(critic, real, fake, device="cpu"):
 
     BATCH_SIZE, pc_dim, point_num = real.shape
     epsilon = torch.rand((BATCH_SIZE, 1, 1), device=device)
-    interpolated_images = real * epsilon + fake * (1 - epsilon)
-    interpolated_images.requires_grad_(True)
+    interpolated = real * epsilon + fake * (1 - epsilon)
+    interpolated.requires_grad_(True)
 
-    critic_output = critic(interpolated_images)
+    norms = torch.norm(interpolated, dim=-1, keepdim=True)
+    interpolated = interpolated / norms.clamp(min=1e-8) 
     
-    # gradients = ∂C(interpolated_images) / ∂(interpolated_images)
+    interpolated = interpolated - interpolated.mean(dim=1, keepdim=True)
+
+    critic_output = critic(interpolated)
+    
+    # gradients = ∂C(interpolated) / ∂(interpolated)
     gradient = torch.autograd.grad(
-        inputs=interpolated_images,
+        inputs=interpolated,
         outputs=critic_output,
         grad_outputs=torch.ones_like(critic_output),
         create_graph=True,

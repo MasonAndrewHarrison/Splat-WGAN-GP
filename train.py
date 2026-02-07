@@ -11,7 +11,7 @@ from torchvision import datasets, transforms
 import random
 import point_cloud as pc
 import render
-from model import Generator, PC_Critic, initialize_weight
+from model import Generator, PC_Critic, init_generator, init_critic
 import point_cloud_dataset as pcd
 import torch.optim as optim
 from utils import gradient_penalty
@@ -32,7 +32,7 @@ def main():
     lambda_GP = 10 
     features = 64
     learning_rate_critic = 5e-5
-    learning_rate_gen = 1e-4
+    learning_rate_gen = 9e-5
     pc_dim = 6
     
 
@@ -60,13 +60,13 @@ def main():
         generator.load_state_dict(torch.load("Generator.pth", map_location=device))
 
     else:   
-        initialize_weight(generator)
+        init_generator(generator)
 
     if os.path.exists("Critic.pth"):
         critic.load_state_dict(torch.load("Critic.pth", map_location=device))
     
     else:
-        initialize_weight(critic)
+        init_critic(critic)
 
     generator.to(device) 
     critic.to(device)
@@ -128,7 +128,7 @@ def main():
                 wasserstein_distance = torch.mean(real_score) - torch.mean(fake_score)
                 print(f"Epoch: {epoch} || Gen: {loss_gen:.4f} || Critic: {loss_critic:.4f} || W-dist: {wasserstein_distance:.4f} || GP: {gp:.4f}")
 
-            if epoch % 1000 == 0 and idx == 0:
+            if epoch % 10000 == 0 and idx == 0:
                 render.show_model(fake_pc[0])
 
 
