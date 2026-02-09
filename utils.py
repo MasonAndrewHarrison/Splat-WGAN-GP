@@ -6,12 +6,11 @@ def gradient_penalty(critic, real, fake, device="cpu"):
     BATCH_SIZE, pc_dim, point_num = real.shape
     epsilon = torch.rand((BATCH_SIZE, 1, 1), device=device)
     interpolated = real * epsilon + fake * (1 - epsilon)
-    interpolated.requires_grad_(True)
-
+    
     norms = torch.norm(interpolated, dim=-1, keepdim=True)
     interpolated = interpolated / norms.clamp(min=1e-8) 
-    
-    interpolated = interpolated - interpolated.mean(dim=1, keepdim=True)
+
+    interpolated.requires_grad_(True)
 
     critic_output = critic(interpolated)
     

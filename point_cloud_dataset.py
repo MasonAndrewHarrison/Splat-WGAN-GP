@@ -34,7 +34,6 @@ class Dataset():
 class PointCloudNormalize():
     def __call__(self, pc):
 
-        #TODO normalize pc here
         avg_x = pc[:, 0].mean()
         avg_y = pc[:, 1].mean()
         avg_z = pc[:, 2].mean()
