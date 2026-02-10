@@ -28,9 +28,9 @@ def main():
     latent_dim = 128
     batch_size = 64
     critic_iterations = 3
-    epochs = 1000
+    epochs = 10000
     lambda_GP = 10 
-    features = 64
+    features = 64 
     learning_rate_critic = 5e-5
     learning_rate_gen = 9e-5
     pc_dim = 6
@@ -128,7 +128,7 @@ def main():
                 wasserstein_distance = torch.mean(real_score) - torch.mean(fake_score)
                 print(f"Epoch: {epoch} || Gen: {loss_gen:.4f} || Critic: {loss_critic:.4f} || W-dist: {wasserstein_distance:.4f} || GP: {gp:.4f}")
 
-            if epoch % 100 == 0 and idx == 0:
+            if epoch % 2000 == 0 and idx == 0:
                 render.show_model(fake_pc[0])
 
 

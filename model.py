@@ -73,8 +73,8 @@ class PC_Critic(nn.Module):
 
         self.point_wise_mpls = nn.Sequential(
             self._Point_Wise_MLP(in_dim, features),
-            self._Point_Wise_MLP(features, features*2),
-            self._Point_Wise_MLP(features*2, features*16)
+            self._Point_Wise_MLP(features, features*8),
+            self._Point_Wise_MLP(features*8, features*16)
         )
 
         self.linear_layers = nn.Sequential(
